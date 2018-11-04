@@ -1,9 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package util;
+package model;
 
 import java.awt.Graphics;
 import java.awt.Color;
@@ -21,6 +16,9 @@ public class Figura implements Serializable{
     public static final int LINEA = 0;
     public static final int RECT = 1;
     public static final int OVAL = 2;
+    public static final int FRECT = 3;
+    public static final int FOVAL = 4;
+    public static final int TXT = 5;
 
     public Figura(final int fig, Point origen, Point destino, Color color) {
         this.fig = fig;
@@ -41,6 +39,14 @@ public class Figura implements Serializable{
             break;
             
             case OVAL: g.drawOval(origen.getX(), origen.getY(),
+                    (destino.getX()-origen.getX()), (destino.getY()-origen.getY()));
+            break;
+            
+            case FRECT: g.fillRect(origen.getX(), origen.getY(),
+                    (destino.getX()-origen.getX()), (destino.getY()-origen.getY()));
+            break;
+            
+            case FOVAL: g.fillOval(origen.getX(), origen.getY(),
                     (destino.getX()-origen.getX()), (destino.getY()-origen.getY()));
             break;
         }

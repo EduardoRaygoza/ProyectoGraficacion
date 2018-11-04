@@ -2,8 +2,8 @@ package view;
 
 import java.awt.Color;
 import javax.swing.JPanel;
-import util.Point;
-import util.Figura;
+import model.Point;
+import model.Figura;
 import java.awt.Graphics;
 import java.util.ArrayList;
 
@@ -20,7 +20,9 @@ public class PaintingPanel extends JPanel{
     public static final int LINEA = 0;
     public static final int RECT = 1;
     public static final int OVAL = 2;
-    
+    public static final int FRECT = 3;
+    public static final int FOVAL = 4;
+    public static final int TXT = 5;
     
     public PaintingPanel(Point origen, Point destino, ArrayList<Figura> lista){
         this.seleccion = 0;
@@ -53,6 +55,12 @@ public class PaintingPanel extends JPanel{
                 g.drawOval(origen.getX(), origen.getY(),
                         (destino.getX()-origen.getX()),
                         (destino.getY()-origen.getY()));
+                break;
+            case FRECT: g.fillRect(origen.getX(), origen.getY(),
+                    (destino.getX()-origen.getX()), (destino.getY()-origen.getY()));
+                break;
+            case FOVAL: g.fillOval(origen.getX(), origen.getY(),
+                    (destino.getX()-origen.getX()), (destino.getY()-origen.getY()));
                 break;
         }
     }

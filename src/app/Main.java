@@ -8,8 +8,9 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JFileChooser;
 import javax.swing.JButton;
-import util.Point;
-import util.Figura;
+import javax.swing.JCheckBox;
+import model.Point;
+import model.Figura;
 import view.PaintingPanel;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -26,6 +27,7 @@ import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -35,21 +37,25 @@ public class Main extends JFrame implements MouseListener, MouseMotionListener, 
     private PaintingPanel pp;
     private JPanel toolPanel, colorPanel;
     private JButton btnLine, btnRect, btnOval, btnColor;
+    private JCheckBox chkFill;
     private Point origen, destino;
-    private boolean clicked;
+    private boolean clicked, input;
     private int seleccion;
     private ArrayList<Figura> lista;
     private Color color;
     private JMenuBar barraMenu;
     private JMenu menu;
-    private JMenuItem itmAbrir, itmGuardar, itmNuevo;
+    private JMenuItem itmAbrir, itmGuardar, itmNuevo, itmInfo;
     private JFileChooser fc;
     private File archivo;
     private ObjectOutputStream oos;
     private ObjectInputStream ios;
+    private String msg, title;
     
     public Main(){
         seleccion = 0;
+        clicked = false;
+        input = false;
         origen = new Point();
         destino = new Point();
         lista = new ArrayList<Figura>();
@@ -61,12 +67,15 @@ public class Main extends JFrame implements MouseListener, MouseMotionListener, 
         btnRect = new JButton("Rectangulo");
         btnOval = new JButton("Ovalo");
         btnColor = new JButton("Color");
+        chkFill = new JCheckBox("Fill");
         barraMenu = new JMenuBar();
         menu = new JMenu("Archivo");
         barraMenu.add(menu);
         itmNuevo = new JMenuItem("Nuevo");
         itmAbrir = new JMenuItem("Abrir archivo");
         itmGuardar = new JMenuItem("Guardar archivo");
+        itmInfo = new JMenuItem("Info");
+        barraMenu.add(itmInfo);
         menu.add(itmNuevo);
         menu.add(itmAbrir);
         menu.add(itmGuardar);
@@ -78,6 +87,7 @@ public class Main extends JFrame implements MouseListener, MouseMotionListener, 
         toolPanel.add(btnOval);
         toolPanel.add(btnColor);
         toolPanel.add(colorPanel);
+        toolPanel.add(chkFill);
         btnLine.addActionListener(this);
         btnRect.addActionListener(this);
         btnOval.addActionListener(this);
@@ -85,6 +95,7 @@ public class Main extends JFrame implements MouseListener, MouseMotionListener, 
         itmAbrir.addActionListener(this);
         itmGuardar.addActionListener(this);
         itmNuevo.addActionListener(this);
+        itmInfo.addActionListener(this);
         setLayout(new BorderLayout());
         add(toolPanel, BorderLayout.NORTH);
         pp.addMouseListener(this);
@@ -92,6 +103,7 @@ public class Main extends JFrame implements MouseListener, MouseMotionListener, 
         add(pp, BorderLayout.CENTER);
         
         fc = new JFileChooser();
+        setTitle("Proyecto Graficacion 2018");
         
         setSize(600, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -134,10 +146,16 @@ public class Main extends JFrame implements MouseListener, MouseMotionListener, 
             seleccion = PaintingPanel.LINEA;
         }
         if(e.getSource() == btnRect){
-            seleccion = PaintingPanel.RECT;
+            if(chkFill.isSelected())
+                seleccion = PaintingPanel.FRECT;
+            else
+                seleccion = PaintingPanel.RECT;
         }
         if(e.getSource() == btnOval){
-            seleccion = PaintingPanel.OVAL;
+            if(chkFill.isSelected())
+                seleccion = PaintingPanel.FOVAL;
+            else
+                seleccion = PaintingPanel.OVAL;
         }
         if(e.getSource() == btnColor){
             color = JColorChooser.showDialog(null, "Selecciona un color...", Color.BLACK);
@@ -160,7 +178,6 @@ public class Main extends JFrame implements MouseListener, MouseMotionListener, 
                 }
                 ios.close();
             }catch(Exception ex){
-                System.out.println("Error: "+e.toString());
             }finally{
                 pp.repaint();
             }
@@ -174,13 +191,36 @@ public class Main extends JFrame implements MouseListener, MouseMotionListener, 
                     try{
                         oos.writeObject(fig);
                     }catch(IOException ex){
-                        System.out.println("Error: "+e.paramString());
                     }
                 });
                 oos.close();
             }catch(IOException ex){
-                System.out.println("Error: "+e.paramString());
+                System.out.println(e.paramString());
             }
+        }
+        if(e.getSource() == itmInfo){
+            msg = "Proyecto de la clase de Graficacion Julio-Diciembre 2018\n"
+                    + "El programa se compone de tres partes, la barra de menu, "
+                    + "la barra de herramientas y el panel de dibujo.\n"
+                    + "en la barra de menu se encuentran las opciones de nuevo dibujo, "
+                    + "abrir un dibujo guardado en un archivo y guardar el dibujo actual "
+                    + "en un archivo.\nEn la barra de herramientas se encuentran las diferentes "
+                    + "opciones de dibujo que se pueden usar las cuales son Linea, Rectangulo y "
+                    + "Ovalo, \nademas de el boton para poder cambiar el color que se usara para "
+                    + "pintar las figuras, tambien se incluye una casilla de seleccion que permite "
+                    + "decidir\nsi la figura que se va a pintar estara rellena de ese color o unicamente.\n"
+                    + "El panel de dibujo es la seccion de color blanco que cubre la mayor parte de la ventana\n"
+                    + "en el se dibujan las figuras que se desean haciendo primero click en el punto que quiere\n"
+                    + "que sea el origen, moviendo el cursor hasta el punto origen deseado y haciendo click de nuevo\n"
+                    + "Se hace uso del efecto liga\n "
+                    + "se pintaran los bordes.\n\n"
+                    + "Integrantes del equipo:\n"
+                    + "-Hector Eduardo Raygoza Aguirre\n"
+                    + "-Diego Valadez Olmos\n"
+                    + "-Jose Julio Villegas Ayala\n"
+                    + "-Cristofer Tosado";
+            title = "Acerca del proyecto";
+            JOptionPane.showMessageDialog(null, msg, title, JOptionPane.INFORMATION_MESSAGE);
         }
         
         pp.setSeleccion(seleccion);
